@@ -26,7 +26,9 @@ public class UserDaoImp implements UserDao {
     @Override
     public void remove(Long id) {
         User user = em.find(User.class, id);
-        em.remove(user);
+        if (user != null) {
+            em.remove(user);
+        }
     }
 
     @Override
@@ -37,5 +39,9 @@ public class UserDaoImp implements UserDao {
     @Override
     public void updateUser(User user) {
         em.merge(user);
+    }
+
+    public String errorMessage() {
+        return "Incorrect ID or DataBase Exception";
     }
 }
