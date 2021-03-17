@@ -62,9 +62,4 @@ public class UserController {
         service.updateUser(user);
         return "redirect:/users";
     }
-//    @PostMapping("/update")
-//    public String updateUser(@ModelAttribute User temp) {
-//
-//        return "redirect:/users";
-//    }
 }

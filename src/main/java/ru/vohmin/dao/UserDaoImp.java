@@ -27,7 +27,6 @@ public class UserDaoImp implements UserDao {
     public void remove(Long id) {
         User user = em.find(User.class, id);
         em.remove(user);
-        em.flush();
     }
 
     @Override
@@ -37,13 +36,6 @@ public class UserDaoImp implements UserDao {
 
     @Override
     public void updateUser(User user) {
-        User transientUser = findUser(user.getId());
-        transientUser.setName(user.getName());
-        transientUser.setLastName(user.getLastName());
-        transientUser.setAge(user.getAge());
-        transientUser.setEmail(user.getEmail());
-        em.merge(transientUser);
+        em.merge(user);
     }
-
-
 }
