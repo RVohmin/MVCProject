@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<html lang="ru" xmlns:data-th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="/>">
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+            rel="stylesheet">
+    <title>Add User</title>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="alert alert-light" role="alert">
+        <a class="btn btn-light" href="/users">All Users</a>
+    </div>
+
+    <form data-th:action="@{/add_user}" data-th:object="${user}" accept-charset="UTF-8" class="row g-3"
+          action="/add_user"
+          method="post">
+        <div class="mb-3">
+            <label for="Input1" class="form-label">First Name</label>
+            <input type="text" class="form-control" name="name" id="Input1" placeholder="Vasya" data-th:field="*{name}">
+        </div>
+        <div class=" mb-3">
+            <label for="Input2" class="form-label">Last Name</label>
+            <input type="text" class="form-control" name="lastName" id="Input2"
+                   placeholder="Pupkin" data-th:field="*{lastName}">
+        </div>
+        <div class="mb-3">
+            <label for="Input3" class="form-label">Age</label>
+            <input type="text" class="form-control" name="age" id="Input3" placeholder="98" data-th:field="*{age}">
+        </div>
+        <div class="mb-3">
+            <label for="Input4" class="form-label">Email address</label>
+            <input type="email" class="form-control" name="email" id="Input4"
+                   placeholder="name@example.com" data-th:field="*{email}">
+        </div>
+        <div class="col-12">
+            <input class="btn btn-info" type="submit" value="Добавить пользователя"/>
+        </div>
+    </form>
+</div>
+</body>
+</html>
