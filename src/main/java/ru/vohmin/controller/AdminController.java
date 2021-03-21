@@ -1,20 +1,20 @@
 package ru.vohmin.controller;
 
+import com.sun.istack.internal.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.vohmin.model.Role;
 import ru.vohmin.model.User;
 import ru.vohmin.service.RoleRepository;
 import ru.vohmin.service.UserService;
 
-import java.util.List;
-import java.util.Set;
-
 @Controller
+@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 @RequestMapping("/admin")
 public class AdminController {
     private final UserService service;
@@ -31,44 +31,35 @@ public class AdminController {
     @GetMapping(value = "/users")
     public String getUsers(ModelMap model) {
         model.addAttribute("authUser", getAuthorizedUser());
-        List<User> users = service.getUsers();
-        model.addAttribute("users", users);
+        model.addAttribute("users", service.getUsers());
         return "users";
     }
 
     @GetMapping("/add_page")
     public String redirectToAddUserForm(ModelMap map) {
         map.addAttribute("authUser", getAuthorizedUser());
-        User user = new User();
-        map.addAttribute("user", user);
-        List<Role> allRoles = roleRepository.findAll();
-        map.addAttribute("allRoles", allRoles);
+        map.addAttribute("user", new User());
+        map.addAttribute("allRoles", roleRepository.findAll());
         return "add_user";
     }
 
     @PostMapping("/add_user")
     public String addUser(@ModelAttribute User user, @RequestParam("roles") String[] rolesFromHtml) {
-        Set<Role> roleSet = user.getRoles();
-        for (String roleId : rolesFromHtml) {
-            roleSet.add(roleRepository.findById(Long.valueOf(roleId)).get()); // создадим Set с одним значением
-        }
         user.setPassword(encoder.encode(user.getPassword()));
-        service.addUser(user);
+        service.addUser(user, rolesFromHtml);
         return "redirect:/admin/users";
     }
 
     @PostMapping("/del_user/{id}")
-    public String delUser(@PathVariable Long id) {
+    public String delUser(@PathVariable @Validated @NotNull Long id) {
         service.deleteUser(id);
         return "redirect:/admin/users";
     }
 
     @PostMapping("/update/{id}")
-    public String redirectToMergePage(@PathVariable Long id, ModelMap map) {
-        User user = service.findUser(id);
-        map.addAttribute("user", user);
-        List<Role> allRoles = roleRepository.findAll();
-        map.addAttribute("allRoles", allRoles);
+    public String redirectToMergePage(@PathVariable @Validated @NotNull Long id, ModelMap map) {
+        map.addAttribute("user", service.findUser(id));
+        map.addAttribute("allRoles", roleRepository.findAll());
         return "update";
     }
 

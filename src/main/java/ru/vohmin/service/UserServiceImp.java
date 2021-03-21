@@ -10,9 +10,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vohmin.dao.UserDao;
+import ru.vohmin.model.Role;
 import ru.vohmin.model.User;
 
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -29,7 +31,11 @@ public class UserServiceImp implements UserService, UserDetailsService {
 
     @Transactional
     @Override
-    public boolean addUser(User user) {
+    public boolean addUser(User user, String[] rolesFromHtml) {
+        Set<Role> roleSet = user.getRoles();
+        for (String roleId : rolesFromHtml) {
+            roleSet.add(roleRepository.findById(Long.valueOf(roleId)).get());
+        }
         userRepository.save(user);
         return true;
     }
