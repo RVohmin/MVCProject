@@ -19,13 +19,12 @@ import ru.vohmin.service.UserService;
 public class AdminController {
     private final UserService service;
     private final RoleRepository roleRepository;
-    private final BCryptPasswordEncoder encoder;
-
     @Autowired
-    public AdminController(UserService service, RoleRepository roleRepository, BCryptPasswordEncoder encoder) {
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    public AdminController(UserService service, RoleRepository roleRepository) {
         this.service = service;
         this.roleRepository = roleRepository;
-        this.encoder = encoder;
     }
 
     @GetMapping(value = "/users")
@@ -45,7 +44,7 @@ public class AdminController {
 
     @PostMapping("/add_user")
     public String addUser(@ModelAttribute User user, @RequestParam("roles") String[] rolesFromHtml) {
-        user.setPassword(encoder.encode(user.getPassword()));
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         service.addUser(user, rolesFromHtml);
         return "redirect:/admin/users";
     }

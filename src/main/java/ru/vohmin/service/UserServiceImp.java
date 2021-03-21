@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vohmin.dao.UserDao;
@@ -24,8 +23,6 @@ public class UserServiceImp implements UserService, UserDetailsService {
     UserRepository userRepository;
     @Autowired
     RoleRepository roleRepository;
-    @Autowired
-    BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     private UserDao userDao;
 
