@@ -27,23 +27,23 @@
         <div style="display: flex; flex-direction: column; width: 15%;">
             <nav class="nav nav-pills flex-column" style="margin-top: 20px; background: white">
                 <div sec:authorize="hasAuthority('ROLE_ADMIN')">
-                    <a class="nav-link active" aria-current="page"
-                       href="/admin/users">Admin</a>
+                    <a class="nav-link" aria-current="page"
+                       th:href="@{/admin/users}">Admin</a>
                 </div>
-                <a sec:authorize="hasAnyAuthority('ROLE_USER')" class="nav-link" th:href="@{/user}">User</a>
+                <a sec:authorize="hasAnyAuthority('ROLE_USER')" class="nav-link active" th:href="@{/user}">User</a>
             </nav>
         </div>
         <div style="display: flex; flex-direction: column; width: 100%;">
             <div style="margin: 0" class="alert alert-light" role="alert">
-                <h1 style="margin: 0">Admin panel</h1>
+                <h1 style="margin: 0">User information page</h1>
             </div>
             <nav class="navbar navbar-light bg-light">
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
-                        <a class="nav-link active" href="" aria-current="page">Users Table</a>
+                        <a class="nav-link active" href="" aria-current="page">About user</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/add_page}">New User</a>
+                    <li sec:authorize="hasAuthority('ROLE_ADMIN')" class="nav-item">
+                        <a class="nav-link" href="/admin/add_page">New User</a>
                     </li>
                 </ul>
             </nav>
@@ -60,31 +60,31 @@
                         <th scope="col">Age</th>
                         <th scope="col">Email</th>
                         <th scope="col">ROLE</th>
-                        <th scope="col">Edit</th>
-                        <th scope="col">Delete</th>
+                        <th sec:authorize="hasAuthority('ROLE_ADMIN')" scope="col">Edit</th>
+                        <th sec:authorize="hasAuthority('ROLE_ADMIN')" scope="col">Delete</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="user : ${users}">
-                        <th th:utext="${user.id}"></th>
-                        <td th:utext="${user.username}"></td>
-                        <td th:utext="${user.lastName}"></td>
-                        <td th:utext="${user.age}"></td>
-                        <td th:utext="${user.email}"></td>
+                    <tr>
+                        <th th:utext="${authUser.id}"></th>
+                        <td th:utext="${authUser.username}"></td>
+                        <td th:utext="${authUser.lastName}"></td>
+                        <td th:utext="${authUser.age}"></td>
+                        <td th:utext="${authUser.email}"></td>
                         <td>
-                            <th:block th:each="role : ${user.roles}">
+                            <th:block th:each="role : ${authUser.roles}">
                                 <span th:text="${role.name}"></span>
                             </th:block>
                         </td>
-                        <td>
-                            <form method="POST" th:action="@{'/admin/update/{id}'(id=${user.id})}" class="col-12">
-                                <input type="hidden" th:value="${user.id}">
+                        <td sec:authorize="hasAuthority('ROLE_ADMIN')">
+                            <form method="POST" th:action="@{'/admin/update/{id}'(id=${authUser.id})}" class="col-12">
+                                <input type="hidden" th:value="${authUser.id}">
                                 <button type="submit" class="btn btn-info">Edit</button>
                             </form>
                         </td>
-                        <td>
-                            <form method="POST" th:action="@{'/admin/del_user/{id}'(id=${user.id})}" class="col-12">
-                                <input type="hidden" th:value="${user.id}">
+                        <td sec:authorize="hasAuthority('ROLE_ADMIN')">
+                            <form method="POST" th:action="@{'/admin/del_user/{id}'(id=${authUser.id})}" class="col-12">
+                                <input type="hidden" th:value="${authUser.id}">
                                 <button type="submit" name="submit" class="btn btn-danger">Delete</button>
                             </form>
                         </td>

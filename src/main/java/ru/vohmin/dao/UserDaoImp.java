@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public class UserDaoImp implements UserDao {
-    @PersistenceContext
+    @PersistenceContext(unitName = "entityManagerFactory")
     EntityManager em;
 
     @Override
@@ -41,7 +41,8 @@ public class UserDaoImp implements UserDao {
         em.merge(user);
     }
 
-    public String errorMessage() {
-        return "Incorrect ID or DataBase Exception";
+    @Override
+    public User findUserByUsername(String username) {
+        return em.find(User.class, username);
     }
 }

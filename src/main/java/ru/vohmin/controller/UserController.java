@@ -1,65 +1,55 @@
 package ru.vohmin.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.vohmin.model.User;
-import ru.vohmin.service.UserService;
 
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class UserController {
-    private final UserService service;
-
-    @Autowired
-    public UserController(UserService service) {
-        this.service = service;
-    }
-
     @GetMapping(value = "/")
-    public String printWelcome() {
+    public String getHomePage() {
         return "index";
     }
 
-    @GetMapping(value = "/users")
-    public String getUsers(ModelMap model) {
-        List<User> users = service.getUsers();
-        model.addAttribute("users", users);
-        return "users";
+    @GetMapping("/login")
+    public String loginPage(@RequestParam(value = "error", required = false) String error,
+                            @RequestParam(value = "logout", required = false) String logout,
+                            ModelMap model) {
+        String errorMessage = null;
+        if (error != null) {
+            errorMessage = "Username or Password is incorrect !!";
+        }
+        if (logout != null) {
+            errorMessage = "You have been successfully logged out !!";
+        }
+        model.addAttribute("errorMessage", errorMessage);
+        return "login";
     }
 
-    @GetMapping("/add_page")
-    public String addUserForm() {
-        return "add_user";
+    @GetMapping(value = "/user")
+    public String getUserPage(ModelMap map) {
+        map.addAttribute("authUser", getAuthorizedUser());
+        return "user";
     }
 
-    @PostMapping("/add_user")
-    public String addUser(@ModelAttribute User user) {
-        service.addUser(user);
-        return "redirect:/users";
+    @GetMapping("/logout")
+    public String logoutPage(HttpServletRequest request, HttpServletResponse response) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        return "redirect:/login?logout=true";
     }
 
-    @PostMapping("/del_user/{id}")
-    public String delUser(@PathVariable Long id) {
-        service.deleteUser(id);
-        return "redirect:/users";
-    }
-
-    @PostMapping("/update/{id}")
-    public String redirectToMergePage(@PathVariable Long id, ModelMap map) {
-        User user = service.findUser(id);
-        map.addAttribute("user", user);
-        return "update";
-    }
-
-    @PostMapping("/update/merge")
-    public String updateUser(@ModelAttribute User user) {
-        service.updateUser(user);
-        return "redirect:/users";
+    private User getAuthorizedUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
