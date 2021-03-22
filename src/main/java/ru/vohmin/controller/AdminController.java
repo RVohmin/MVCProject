@@ -4,7 +4,7 @@ import com.sun.istack.internal.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +20,7 @@ public class AdminController {
     private final UserService service;
     private final RoleRepository roleRepository;
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private PasswordEncoder passwordEncoder;
     @Autowired
     public AdminController(UserService service, RoleRepository roleRepository) {
         this.service = service;
@@ -44,7 +44,7 @@ public class AdminController {
 
     @PostMapping("/add_user")
     public String addUser(@ModelAttribute User user, @RequestParam("roles") String[] rolesFromHtml) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         service.addUser(user, rolesFromHtml);
         return "redirect:/admin/users";
     }
